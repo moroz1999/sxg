@@ -7,6 +7,6 @@
     "type": "package",
 
     "autoload": {
-        "psr-0": { "Sxg": "src/" },        
-    },
+        "psr-0": { "Sxg": "src/" } 
+    }
 }
