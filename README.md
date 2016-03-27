@@ -1,6 +1,4 @@
 # SXG
-> A curated list of awesome README
-
 This repository contains the tools required for SXG images generation in PHP.
 
 ## Usage example
