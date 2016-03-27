@@ -1,0 +1,11 @@
+{
+    "name": "moroz1999/Sxg",
+    "description": "SXG conversion/generation on PHP",
+    "keywords": ["php", "sxg", "zx spectrum"],
+    "homepage": "https://github.com/moroz1999/Sxg",
+    "license": "MIT",
+
+    "autoload": {
+        "psr-0": { "Sxg": "src/" },        
+    },
+}

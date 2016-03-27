@@ -1,6 +1,7 @@
 <?php
 
-class SxgImage
+namespace Sxg;
+class Image
 {
     const SXG_PALETTE_FORMAT_CLUT = 0;
     const SXG_PALETTE_FORMAT_PWM = 1;
