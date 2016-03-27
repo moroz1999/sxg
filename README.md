@@ -30,6 +30,15 @@ $image->setPaletteType($image::SXG_PALETTE_FORMAT_CLUT);
 $image->importFromGd($gd);
 file_put_contents('test.sxg', $image->getSxgData());
 ```
+## Installation
+Composer
+```json
+{
+    "require": {
+		"moroz1999/sxg": "*"
+    }
+}
+```
 
 ## Links
 - ["SXG Format description"](http://tslabs.info/forum/viewtopic.php?f=25&t=526) - *in Russian*
