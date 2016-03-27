@@ -257,7 +257,7 @@ class Image
         if ($this->colorFormat == self::SXG_COLOR_FORMAT_16) {
             $firstPixel = false;
             foreach ($this->pixels as $pixel) {
-                if (!$firstPixel) {
+                if ($firstPixel === false) {
                     $firstPixel = $pixel;
                 } else {
                     $sxgPixels[] = (($firstPixel & 0x1f) << 4) + ($pixel & 0x1f);
