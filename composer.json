@@ -4,6 +4,7 @@
     "keywords": ["php", "sxg", "zx spectrum", "zx evolution"],
     "homepage": "https://github.com/moroz1999/Sxg",
     "license": "CC0 1.0 Universal",
+    "type": "package",
 
     "autoload": {
         "psr-0": { "Sxg": "src/" },        
