@@ -1,6 +1,7 @@
 <?php
 
 namespace Sxg;
+
 class Image
 {
     const SXG_PALETTE_FORMAT_CLUT = 0;
@@ -128,7 +129,7 @@ class Image
 
     /**
      * @param mixed $palette
-     * @return SxgImage
+     * @return \Sxg\Image
      */
     public function setRgbPalette($palette)
     {
