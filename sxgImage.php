@@ -2,15 +2,17 @@
 
 class SxgImage
 {
-    const PALETTE_CLUT = 0;
-    const PALETTE_PWM = 1;
-    protected $version = 3;
+    const SXG_PALETTE_FORMAT_CLUT = 0;
+    const SXG_PALETTE_FORMAT_PWM = 1;
+    const SXG_COLOR_FORMAT_16 = 1;
+    const SXG_COLOR_FORMAT_256 = 2;
+    protected $version = 2;
     protected $backgroundColor = 0;
     protected $packingType = 0;
-    protected $palette;
-    protected $paletteType = self::PALETTE_PWM;
+    protected $rgbPalette;
+    protected $paletteType = self::SXG_PALETTE_FORMAT_PWM;
 
-    protected $splittedPalette;
+    protected $splittedRgbPalette;
     protected $pixels;
     protected $colorFormat = 1;
     protected $width = 320;
@@ -106,6 +108,7 @@ class SxgImage
     {
         return $this->backgroundColor;
     }
+
     /**
      * @param int $backgroundColor
      */
@@ -113,24 +116,25 @@ class SxgImage
     {
         $this->backgroundColor = $backgroundColor;
     }
+
     /**
      * @return mixed
      */
-    public function getPalette()
+    public function getRgbPalette()
     {
-        return $this->palette;
+        return $this->rgbPalette;
     }
 
     /**
      * @param mixed $palette
      * @return SxgImage
      */
-    public function setPalette($palette)
+    public function setRgbPalette($palette)
     {
-        $this->palette = $palette;
-        $this->splittedPalette = [];
-        foreach ($this->palette as $color) {
-            $this->splittedPalette[] = [($color >> 16) & 0xFF, ($color >> 8) & 0xFF, $color & 0xFF, $color];
+        $this->rgbPalette = $palette;
+        $this->splittedRgbPalette = [];
+        foreach ($this->rgbPalette as $color) {
+            $this->splittedRgbPalette[] = [($color >> 16) & 0xFF, ($color >> 8) & 0xFF, $color & 0xFF, $color];
         }
         return $this;
     }
@@ -164,7 +168,7 @@ class SxgImage
         $palette = imagecreate($this->width, $this->height);
 
         //assign sxg palette colors to palette holding resource
-        foreach ($this->splittedPalette as $color) {
+        foreach ($this->splittedRgbPalette as $color) {
             imagecolorallocate($palette, $color[0], $color[1], $color[2]);
         }
 
@@ -208,6 +212,7 @@ class SxgImage
         //        +#0210 #xxxx данные битмап
 
         $sxgPalette = $this->getSxgPalette();
+        $sxgPixels = $this->getSxgPixels();
 
         $data = chr(0x7F) . 'SXG';
         $data .= chr($this->version);
@@ -226,10 +231,11 @@ class SxgImage
         foreach ($sxgPalette as $sxgColor) {
             $data .= $this->littleEndian($sxgColor);
         }
-
-        foreach ($this->pixels as $pixel) {
-            $data .= chr($pixel);
+        foreach ($sxgPixels as $sxgPixelsByte) {
+            $data .= chr($sxgPixelsByte);
         }
+
+
         return $data;
     }
 
@@ -243,25 +249,48 @@ class SxgImage
         return chr($integer >> 8 & 0xFF) . chr($integer & 0xFF);
     }
 
+    public function getSxgPixels()
+    {
+        $sxgPixels = [];
+        if ($this->colorFormat == self::SXG_COLOR_FORMAT_16) {
+            $firstPixel = false;
+            foreach ($this->pixels as $pixel) {
+                if (!$firstPixel) {
+                    $firstPixel = $pixel;
+                } else {
+                    $sxgPixels[] = (($firstPixel & 0x1f) << 4) + ($pixel & 0x1f);
+                    $firstPixel = false;
+                }
+            }
+        } elseif ($this->colorFormat == self::SXG_COLOR_FORMAT_256) {
+            foreach ($this->pixels as $pixel) {
+                $sxgPixels[] = $pixel;
+            }
+        }
+        return $sxgPixels;
+    }
+
     public function getSxgPalette()
     {
         $sxgPalette = [];
-        if ($this->paletteType == self::PALETTE_PWM) {
-            foreach ($this->splittedPalette as $color) {
+        if ($this->paletteType == self::SXG_PALETTE_FORMAT_PWM) {
+            foreach ($this->splittedRgbPalette as $color) {
                 $sxgPalette[] = ($color[0] >> 3 << 10) + ($color[1] >> 3 << 5) + ($color[2] >> 3) + 32768;
             }
-        } elseif ($this->paletteType == self::PALETTE_CLUT) {
-            foreach ($this->splittedPalette as $color) {
+        } elseif ($this->paletteType == self::SXG_PALETTE_FORMAT_CLUT) {
+            foreach ($this->splittedRgbPalette as $color) {
                 $sxgPalette[] = ($this->findClosestClutValue($color[0]) << 10) + ($this->findClosestClutValue($color[1]) << 5) + $this->findClosestClutValue($color[2]);
             }
         }
         return $sxgPalette;
     }
-    protected function findClosestClutValue($colorByte){
+
+    protected function findClosestClutValue($colorByte)
+    {
         $closest = null;
         $closestDifference = PHP_INT_MAX;
-        foreach (self::$clut as $sxgColor => $clutValue){
-            if (($difference = abs($colorByte - $clutValue)) < $closestDifference || $closest === null){
+        foreach (self::$clut as $sxgColor => $clutValue) {
+            if (($difference = abs($colorByte - $clutValue)) < $closestDifference || $closest === null) {
                 $closestDifference = $difference;
                 $closest = $sxgColor;
             }
