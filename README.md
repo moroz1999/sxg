@@ -25,6 +25,7 @@ $array = [
     0xb58169,
 ];
 $image->setColorFormat($image::SXG_COLOR_FORMAT_16);
+//optional external palette
 $image->setRgbPalette($array);
 $image->setPaletteType($image::SXG_PALETTE_FORMAT_CLUT);
 $image->importFromGd($gd);
