@@ -42,7 +42,7 @@ Composer
 
 ## Links
 - ["SXG Format description"](http://forum.tslabs.info/viewtopic.php?f=25&t=526) - *in Russian*
-- ["Video modes and architecture of TS-Config on ZX Evolution"](http://forum.tslabs.info/forum/viewtopic.php?f=35&t=178) - *in Russian*
+- ["Video modes and architecture of TS-Config on ZX Evolution"](http://forum.tslabs.info/viewtopic.php?f=35&t=178) - *in Russian*
 
 ## License
 Creative Commons Zero v1.0 Universal
