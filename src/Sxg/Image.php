@@ -20,31 +20,31 @@ class Image
     protected $width;
     protected $height;
     protected static $clut = [
-        0 => 0,
-        1 => 10,
-        2 => 21,
-        3 => 31,
-        4 => 42,
-        5 => 53,
-        6 => 63,
-        7 => 74,
-        8 => 85,
-        9 => 95,
-        10 => 106,
-        11 => 117,
-        12 => 127,
-        13 => 138,
-        14 => 149,
-        15 => 159,
-        16 => 170,
-        17 => 181,
-        18 => 191,
-        19 => 202,
-        20 => 213,
-        21 => 223,
-        22 => 234,
-        23 => 245,
-        24 => 255,
+        0,
+        10,
+        21,
+        31,
+        42,
+        53,
+        63,
+        74,
+        85,
+        95,
+        106,
+        117,
+        127,
+        138,
+        149,
+        159,
+        170,
+        181,
+        191,
+        202,
+        213,
+        223,
+        234,
+        245,
+        255,
     ];
 
     /**
@@ -84,7 +84,7 @@ class Image
      */
     public function setColorFormat($colorFormat)
     {
-        $this->colorFormat = $colorFormat;
+        $this->colorFormat = (int)$colorFormat;
     }
 
     /**
@@ -177,9 +177,9 @@ class Image
         } else {
             $newObject = imagecreatetruecolor($this->width, $this->height);
             imagecopy($newObject, $gdObject, 0, 0, 0, 0, $this->width, $this->height);
-            if ($this->colorFormat == self::SXG_COLOR_FORMAT_16) {
+            if ($this->colorFormat === self::SXG_COLOR_FORMAT_16) {
                 imagetruecolortopalette($newObject, false, 16);
-            } elseif ($this->colorFormat == self::SXG_COLOR_FORMAT_256) {
+            } elseif ($this->colorFormat === self::SXG_COLOR_FORMAT_256) {
                 imagetruecolortopalette($newObject, false, 256);
             }
             imagecolormatch($gdObject, $newObject);
@@ -254,7 +254,7 @@ class Image
     public function getSxgPixels()
     {
         $sxgPixels = [];
-        if ($this->colorFormat == self::SXG_COLOR_FORMAT_16) {
+        if ($this->colorFormat === self::SXG_COLOR_FORMAT_16) {
             $firstPixel = false;
             foreach ($this->pixels as $pixel) {
                 if ($firstPixel === false) {
@@ -264,7 +264,7 @@ class Image
                     $firstPixel = false;
                 }
             }
-        } elseif ($this->colorFormat == self::SXG_COLOR_FORMAT_256) {
+        } elseif ($this->colorFormat === self::SXG_COLOR_FORMAT_256) {
             foreach ($this->pixels as $pixel) {
                 $sxgPixels[] = $pixel;
             }
@@ -276,9 +276,11 @@ class Image
     {
         if (($this->sxgPalette === null) && $this->rgbPalette) {
             $this->sxgPalette = [];
-            if ($this->paletteType == self::SXG_PALETTE_FORMAT_PWM) {
+            if ($this->paletteType === self::SXG_PALETTE_FORMAT_PWM) {
                 foreach ($this->rgbPalette as $color) {
-                    $this->sxgPalette[] = ($color[0] >> 3 << 10) + ($color[1] >> 3 << 5) + ($color[2] >> 3) + 32768;
+                    if ($color !== null){
+                        $this->sxgPalette[] = ($color[0] >> 3 << 10) + ($color[1] >> 3 << 5) + ($color[2] >> 3) + 32768;
+                    }
                 }
             } elseif ($this->paletteType == self::SXG_PALETTE_FORMAT_CLUT) {
                 foreach ($this->rgbPalette as $color) {
@@ -291,9 +293,9 @@ class Image
 
     protected function importGdObject($gd)
     {
-        if ($this->colorFormat == self::SXG_COLOR_FORMAT_16) {
+        if ($this->colorFormat === self::SXG_COLOR_FORMAT_16) {
             $this->rgbPalette = array_fill(0, 16, null);
-        } elseif ($this->colorFormat == self::SXG_COLOR_FORMAT_256) {
+        } elseif ($this->colorFormat === self::SXG_COLOR_FORMAT_256) {
             $this->rgbPalette = array_fill(0, 256, null);
         }
         $this->pixels = [];
